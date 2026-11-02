@@ -1,12 +1,12 @@
 # ==============================================================================
-# RENDER BLUEPRINT SPECIFICATION — ZEXO LICENSE SERVER & DATABASE
+# RENDER BLUEPRINT SPECIFICATION — AZEROX VIP LICENSE SERVER & DATABASE
 # ==============================================================================
 # This Blueprint guarantees deployment stability, persistent environment variables,
 # and permanent PostgreSQL database storage across all future updates.
 # ==============================================================================
 services:
   - type: web
-    name: zexo-license-server
+    name: azerox-vip-server
     runtime: node
     plan: free
     region: oregon
@@ -22,15 +22,15 @@ services:
       - key: PORT
         value: 10000
       - key: ADMIN_USERNAME
-        value: MADARA-FF
+        value: AZEROX
       - key: ADMIN_SECRET
-        value: rootoptimizer_secret_2026
+        value: azerox_vip_secret_2026
       - key: ADMIN_PASSWORD
         value: ABHISHEK!
       - key: APP_LATEST_VERSION
-        value: 1.4.7
+        value: 1.0.0
       - key: APP_VERSION_CODE
-        value: 49
+        value: 1
       - key: APP_MIN_VERSION
         value: 1.0.0
       - key: APP_DOWNLOAD_URL
@@ -38,13 +38,13 @@ services:
       # Connect persistent PostgreSQL database
       - key: DATABASE_URL
         fromDatabase:
-          name: zexo-db
+          name: azerox-vip-db
           property: connectionString
 
 # Managed PostgreSQL Database: eliminates ephemeral SQLite data loss on restarts
 databases:
-  - name: zexo-db
+  - name: azerox-vip-db
     plan: free
     region: oregon
-    databaseName: zexo_licenses
-    user: zexo_admin
+    databaseName: azerox_vip_licenses
+    user: azerox_vip_admin
