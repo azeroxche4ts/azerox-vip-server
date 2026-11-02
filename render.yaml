@@ -1,0 +1,50 @@
+# ==============================================================================
+# RENDER BLUEPRINT SPECIFICATION — ZEXO LICENSE SERVER & DATABASE
+# ==============================================================================
+# This Blueprint guarantees deployment stability, persistent environment variables,
+# and permanent PostgreSQL database storage across all future updates.
+# ==============================================================================
+services:
+  - type: web
+    name: zexo-license-server
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.11.0
+      - key: PORT
+        value: 10000
+      - key: ADMIN_USERNAME
+        value: MADARA-FF
+      - key: ADMIN_SECRET
+        value: rootoptimizer_secret_2026
+      - key: ADMIN_PASSWORD
+        value: ABHISHEK!
+      - key: APP_LATEST_VERSION
+        value: 1.4.7
+      - key: APP_VERSION_CODE
+        value: 49
+      - key: APP_MIN_VERSION
+        value: 1.0.0
+      - key: APP_DOWNLOAD_URL
+        value: /api/app/download
+      # Connect persistent PostgreSQL database
+      - key: DATABASE_URL
+        fromDatabase:
+          name: zexo-db
+          property: connectionString
+
+# Managed PostgreSQL Database: eliminates ephemeral SQLite data loss on restarts
+databases:
+  - name: zexo-db
+    plan: free
+    region: oregon
+    databaseName: zexo_licenses
+    user: zexo_admin

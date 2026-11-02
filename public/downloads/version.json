@@ -1,0 +1,12 @@
+{
+  "latest_version": "1.4.7",
+  "version_code": 49,
+  "min_version": "1.0.0",
+  "title": "Z E X O Settings Layout & Custom Connection Hub Update",
+  "release_notes": "Streamlined card layout without redundant section category titles, and updated custom high-definition Connection Hub graphic.",
+  "apk_filename": "RootOptimizer.apk",
+  "download_url": "/api/app/download",
+  "file_size_bytes": 7562643,
+  "sha256": "2e49cfb9c5cc34b79990dbfb721ff307775d1a595589afde32e92615e485e897",
+  "updated_at": "2026-10-27T07:33:00.000Z"
+}

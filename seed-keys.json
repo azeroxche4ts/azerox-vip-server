@@ -1,0 +1,41 @@
+[
+  {
+    "key": "AZEROX-VIP-P2TE-SNUG-3WH9-Y42V",
+    "product": "AZEROX VIP",
+    "status": "UNUSED",
+    "duration_hours": 720,
+    "created_at": "2026-11-02 12:00:00",
+    "activated_at": null,
+    "expires_at": null,
+    "max_devices": 1,
+    "customer_name": "AZEROX VIP User",
+    "notes": "VIP 30 Days Key",
+    "activations": []
+  },
+  {
+    "key": "AZEROX-VIP-4Q2T-A4AN-3QD2-W7VA",
+    "product": "AZEROX VIP",
+    "status": "UNUSED",
+    "duration_hours": 168,
+    "created_at": "2026-11-02 03:27:47",
+    "activated_at": null,
+    "expires_at": null,
+    "max_devices": 1,
+    "customer_name": "VIP User",
+    "notes": "VIP 7 Days Key",
+    "activations": []
+  },
+  {
+    "key": "AZEROX-VIP-8K9L-2M4N-6P8Q-1R3S",
+    "product": "AZEROX VIP",
+    "status": "UNUSED",
+    "duration_hours": 24,
+    "created_at": "2026-11-02 12:00:00",
+    "activated_at": null,
+    "expires_at": null,
+    "max_devices": 1,
+    "customer_name": "VIP User",
+    "notes": "VIP 1 Day Key",
+    "activations": []
+  }
+]

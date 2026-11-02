@@ -1,0 +1,31 @@
+{
+  "name": "azerox-vip-license-server",
+  "version": "1.0.0",
+  "description": "AZEROX VIP License & Key Management Server",
+  "main": "server.js",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node --experimental-sqlite server.js",
+    "test": "node --experimental-sqlite --test --test-concurrency=1 tests/*.test.js",
+    "config:check": "node scripts/validate-config.js",
+    "config:check:prod": "node scripts/validate-config.js --production",
+    "integrity:check": "node scripts/check-integrity.js",
+    "deploy:verify": "node scripts/verify-deployment.js"
+  },
+  "keywords": [
+    "zexo",
+    "license-server",
+    "auth",
+    "optimizer"
+  ],
+  "author": "AZEROX",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "pg": "^8.23.1"
+  }
+}
