@@ -113,6 +113,8 @@ app.get('/api/admin/events', async (req, res) => {
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
+        runtime: '24/7 Persistent',
+        uptime: process.uptime(),
         service: 'Zexora License Authority',
         developedBy: 'AZEROX',
         copyright: '© All rights reserved',
@@ -368,7 +370,9 @@ async function handleKeyGeneration(req, res) {
             generatedKeys.push({
                 id: keyRecord.id,
                 key: rawKey,
+                key_display: rawKey,
                 product: product.name,
+                product_name: product.name,
                 duration_hours: effectiveHours,
                 is_permanent: false,
                 created_at: keyRecord.created_at,
@@ -627,6 +631,28 @@ async function handleListKeys(req, res) {
 }
 app.get('/api/keys', requireAdmin, handleListKeys);
 app.get('/api/admin/licenses', requireAdmin, handleListKeys);
+
+// Export & Backup Endpoints for JSON backups
+async function handleExportKeys(req, res) {
+    try {
+        const seedKeys = await db.exportSeedKeys();
+        const allKeys = await db.getAllKeys({ limit: 10000 });
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', 'attachment; filename="azerox-keys-backup.json"');
+        return res.json({
+            success: true,
+            runtime: '24/7 Persistent',
+            count: allKeys.length,
+            exported_at: new Date().toISOString(),
+            keys: allKeys,
+            seed_keys: seedKeys
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Failed to export keys: ' + err.message });
+    }
+}
+app.get('/api/keys/export', requireAdmin, handleExportKeys);
+app.get('/api/admin/keys/backup', requireAdmin, handleExportKeys);
 
 // Get single key details & activations
 app.get('/api/keys/:id', requireAdmin, async (req, res) => {
@@ -1279,7 +1305,7 @@ async function handleCustomerActivate(req, res) {
             return res.json({
                 success: true,
                 message: 'Activation Successful',
-                product: keyRecord.product_name || 'OPTIMIZE',
+                product: keyRecord.product_name || 'AZEROX VIP',
                 developer: 'AZEROX',
                 copyright: '© All rights reserved',
                 status: 'ACTIVE',
@@ -1292,7 +1318,7 @@ async function handleCustomerActivate(req, res) {
                 device_registered: true,
                 license: {
                     key: keyRecord.key_display,
-                    product: keyRecord.product_name || 'OPTIMIZE',
+                    product: keyRecord.product_name || 'AZEROX VIP',
                     developer: 'AZEROX',
                     status: 'ACTIVE',
                     activated_at: keyRecord.activated_at || existingActivation.activated_at,
@@ -1368,7 +1394,7 @@ async function handleCustomerActivate(req, res) {
             device_registered: true,
             license: {
                 key: keyRecord.key_display,
-                product: keyRecord.product_name || 'OPTIMIZE',
+                product: keyRecord.product_name || 'AZEROX VIP',
                 developer: 'AZEROX',
                 status: 'ACTIVE',
                 activated_at: activatedAtIso,
@@ -2139,16 +2165,26 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Keep-alive pinger to prevent Render free-tier 15-minute inactivity spin-down
+// Self-Targeted 24/7 Heartbeat keep-alive pinger to prevent cloud containers from sleeping
 function startKeepAlive() {
-    if (!config.isRender && !process.env.ENABLE_KEEP_ALIVE) return;
+    if (config.isTest) return;
     const KEEP_ALIVE_INTERVAL = 8 * 60 * 1000; // 8 minutes
-    setInterval(async () => {
+    const getTargetUrl = () => {
+        const port = config.port || 3000;
+        if (process.env.RENDER_EXTERNAL_URL) {
+            return `${process.env.RENDER_EXTERNAL_URL.replace(/\/$/, '')}/api/health`;
+        }
+        if (process.env.SELF_URL) {
+            return process.env.SELF_URL;
+        }
+        return `http://127.0.0.1:${port}/api/health`;
+    };
+
+    const ping = async () => {
         try {
-            const cloudUrl = config.cloudServerUrl;
-            const pingUrl = process.env.SELF_URL || `${cloudUrl}/api/health`;
+            const pingUrl = getTargetUrl();
             const res = await fetch(pingUrl, {
-                headers: { 'User-Agent': 'ZexoKeepAlive/1.0' }
+                headers: { 'User-Agent': 'AzeroxKeepAlive/24-7' }
             });
             if (res.ok) {
                 console.log(`[KEEP-ALIVE] Heartbeat ping successful to ${pingUrl} at ${new Date().toISOString()}`);
@@ -2156,17 +2192,12 @@ function startKeepAlive() {
         } catch (e) {
             console.warn('[KEEP-ALIVE] Heartbeat ping deferred:', e.message);
         }
-    }, KEEP_ALIVE_INTERVAL).unref();
+    };
+
+    setInterval(ping, KEEP_ALIVE_INTERVAL).unref();
 
     // Initial ping shortly after server start
-    setTimeout(async () => {
-        try {
-            const cloudUrl = config.cloudServerUrl;
-            const pingUrl = process.env.SELF_URL || `${cloudUrl}/api/health`;
-            await fetch(pingUrl, { headers: { 'User-Agent': 'ZexoKeepAlive/1.0' } });
-            console.log(`[KEEP-ALIVE] Initial keep-alive ping dispatched to ${pingUrl}`);
-        } catch (e) {}
-    }, 15000).unref();
+    setTimeout(ping, 10000).unref();
 }
 
 // Pre-flight configuration validation & server startup

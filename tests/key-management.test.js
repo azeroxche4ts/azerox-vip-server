@@ -66,7 +66,8 @@ test('Key Management & UI Test Suite', async (t) => {
             testDbPath,
             `${testDbPath}-wal`,
             `${testDbPath}-shm`,
-            testSeedPath
+            testSeedPath,
+            `${testSeedPath}.backup`
         ];
         for (const f of cleanupFiles) {
             try {
@@ -486,5 +487,70 @@ test('Key Management & UI Test Suite', async (t) => {
         assert.strictEqual(validAct.body.success, true);
 
         await db.deleteKey(vipKey.id, 'test');
+    });
+
+    await t.test('8. UI Total Keys rendering: renders AZEROX VIP keys cleanly without ReferenceError', async () => {
+        const indexHtmlPath = path.join(__dirname, '..', 'public', 'index.html');
+        const content = fs.readFileSync(indexHtmlPath, 'utf8');
+
+        // Check defaults in UI
+        assert.ok(content.includes("let currentDashboard = 'AZEROX VIP'"), 'currentDashboard must default to AZEROX VIP');
+        assert.ok(!content.includes("!isPerm ?"), 'isPerm must not be referenced without definition');
+
+        // VM test of UI script rendering keys
+        const scriptMatch = content.match(/<script[\s\S]*?>([\s\S]*?)<\/script>/i);
+        assert.ok(scriptMatch, 'script tag must exist in index.html');
+        const vm = require('node:vm');
+        const elements = {};
+        const context = {
+            document: {
+                getElementById: (id) => {
+                    if (!elements[id]) {
+                        elements[id] = {
+                            id,
+                            style: {},
+                            classList: { add: ()=>{}, remove: ()=>{}, toggle: ()=>{} },
+                            innerText: '',
+                            value: '',
+                            querySelectorAll: () => [],
+                            set innerHTML(val) { this._html = val; },
+                            get innerHTML() { return this._html || ''; }
+                        };
+                    }
+                    return elements[id];
+                },
+                querySelectorAll: () => [],
+                querySelector: () => ({ style: {}, classList: { add: ()=>{}, remove: ()=>{}, toggle: ()=>{} }, innerText: '' }),
+                addEventListener: () => {},
+                body: { appendChild: ()=>{}, removeChild: ()=>{} },
+                createElement: () => ({ select: ()=>{}, style: {} }),
+                execCommand: () => {}
+            },
+            window: { addEventListener: () => {}, location: { hash: '' } },
+            localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+            sessionStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+            console: console,
+            setTimeout: setTimeout, clearTimeout: clearTimeout, setInterval: setInterval, clearInterval: clearInterval,
+            fetch: async () => ({ ok: true, json: async () => ({ success: true, keys: [] }) }),
+            EventSource: function() { this.close = () => {}; },
+            navigator: { clipboard: { writeText: async () => {} } }
+        };
+        vm.createContext(context);
+        vm.runInContext(scriptMatch[1] + '; Object.assign(this, { currentDashboard, allKeys, filterKeys, renderKeysList, saveAllKeys });', context);
+
+        context.saveAllKeys([
+            { id: 101, key_display: 'AZEROX-VIP-TEST-001', product_name: 'AZEROX VIP', status: 'UNUSED', duration_hours: 24, created_at: new Date().toISOString() },
+            { id: 102, key_display: 'AZEROX-VIP-TEST-002', product_name: 'AZEROX VIP', status: 'ACTIVE', duration_hours: 720, expires_at: new Date(Date.now() + 100000).toISOString(), created_at: new Date().toISOString() }
+        ]);
+
+        // renderKeysList must execute without ReferenceError and populate container
+        assert.doesNotThrow(() => {
+            context.renderKeysList();
+        }, 'renderKeysList must execute without throwing an error');
+
+        const rendered = elements['keysListContainer']?.innerHTML || '';
+        assert.ok(rendered.includes('AZEROX-VIP-TEST-001'), 'Rendered HTML must include key 1');
+        assert.ok(rendered.includes('AZEROX-VIP-TEST-002'), 'Rendered HTML must include key 2');
+        assert.ok(rendered.includes('AZEROX VIP'), 'Rendered HTML must show AZEROX VIP product badge');
     });
 });

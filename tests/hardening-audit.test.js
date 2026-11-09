@@ -45,6 +45,12 @@ function makeRequest(server, options = {}) {
 
 test('Hardening Audit Test Suite (Phases 1-11)', async (t) => {
     let server;
+    const versionFile = path.join(__dirname, '..', 'public', 'downloads', 'version.json');
+    let versionBackup = null;
+    if (fs.existsSync(versionFile)) {
+        versionBackup = fs.readFileSync(versionFile, 'utf8');
+    }
+
     await db.initDatabase();
 
     await new Promise((resolve) => {
@@ -54,8 +60,14 @@ test('Hardening Audit Test Suite (Phases 1-11)', async (t) => {
     // Clean up test database files after suite completes
     t.after(() => {
         if (server) server.close();
+        if (versionBackup && fs.existsSync(versionFile)) {
+            try { fs.writeFileSync(versionFile, versionBackup, 'utf8'); } catch {}
+        }
         try { fs.unlinkSync(testDbPath); } catch {}
+        try { fs.unlinkSync(`${testDbPath}-wal`); } catch {}
+        try { fs.unlinkSync(`${testDbPath}-shm`); } catch {}
         try { fs.unlinkSync(testSeedPath); } catch {}
+        try { fs.unlinkSync(`${testSeedPath}.backup`); } catch {}
     });
 
     await t.test('1. HTTP Range Request Support for Resumable APK Downloads', async () => {

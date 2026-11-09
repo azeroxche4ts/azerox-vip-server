@@ -76,7 +76,8 @@ test('Release & Update Reliability Test Suite (PHASE 11 Verification)', async (t
             testDbPath,
             `${testDbPath}-wal`,
             `${testDbPath}-shm`,
-            testSeedPath
+            testSeedPath,
+            `${testSeedPath}.backup`
         ];
         for (const f of cleanupFiles) {
             try { if (fs.existsSync(f)) fs.unlinkSync(f); } catch {}

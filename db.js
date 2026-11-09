@@ -31,9 +31,33 @@ if (DATABASE_URL && DATABASE_URL.startsWith('postgres')) {
     sqliteDb = new DatabaseSync(DB_PATH);
     try {
         sqliteDb.exec('PRAGMA journal_mode = WAL;');
+        sqliteDb.exec('PRAGMA synchronous = NORMAL;');
         sqliteDb.exec('PRAGMA busy_timeout = 10000;');
     } catch {}
     console.log('[DB] Using local SQLite database:', DB_PATH);
+}
+
+function checkpointSqlite(mode = 'PASSIVE') {
+    if (sqliteDb) {
+        try {
+            sqliteDb.exec(`PRAGMA wal_checkpoint(${mode});`);
+        } catch (e) {
+            // non-fatal checkpoint warning
+        }
+    }
+}
+
+if (typeof process !== 'undefined') {
+    const handleShutdown = () => {
+        try {
+            if (sqliteDb) {
+                sqliteDb.exec('PRAGMA wal_checkpoint(TRUNCATE);');
+            }
+        } catch (e) {}
+    };
+    process.once('SIGTERM', handleShutdown);
+    process.once('SIGINT', handleShutdown);
+    process.once('beforeExit', handleShutdown);
 }
 
 function getSeedFilePath() {
@@ -53,6 +77,7 @@ function setSqliteDb(customPath) {
     sqliteDb = new DatabaseSync(customPath);
     try {
         sqliteDb.exec('PRAGMA journal_mode = WAL;');
+        sqliteDb.exec('PRAGMA synchronous = NORMAL;');
         sqliteDb.exec('PRAGMA busy_timeout = 10000;');
     } catch {}
     return sqliteDb;
@@ -523,7 +548,7 @@ async function initDatabase() {
 async function exportSeedKeys() {
     try {
         const keysRes = await query(`
-            SELECT k.*, p.name as product_name
+            SELECT k.*, COALESCE(p.name, 'AZEROX VIP') as product_name
             FROM activation_keys k
             LEFT JOIN products p ON k.product_id = p.id
             ORDER BY k.created_at ASC
@@ -625,14 +650,36 @@ async function exportSeedKeys() {
 
         const finalOutput = Array.from(existingSeedMap.values());
         if (finalOutput.length > 0) {
+            const jsonStr = JSON.stringify(finalOutput, null, 2);
+            const backupPath = `${seedPath}.backup`;
+
+            // 1. Primary seed-keys.json write with direct write fallback
             try {
                 const tmpPath = `${seedPath}.${Date.now()}.${Math.random().toString(36).slice(2)}.tmp`;
-                fs.writeFileSync(tmpPath, JSON.stringify(finalOutput, null, 2), 'utf8');
+                fs.writeFileSync(tmpPath, jsonStr, 'utf8');
                 fs.renameSync(tmpPath, seedPath);
             } catch (e) {
-                console.warn('[SEED] Atomic write warning for seed file:', e.message);
+                try {
+                    fs.writeFileSync(seedPath, jsonStr, 'utf8');
+                } catch (writeErr) {
+                    console.warn('[SEED] Atomic write warning for seed file:', writeErr.message);
+                }
+            }
+
+            // 2. Redundant backup storage: seed-keys.json.backup
+            try {
+                const tmpBackup = `${backupPath}.${Date.now()}.${Math.random().toString(36).slice(2)}.tmp`;
+                fs.writeFileSync(tmpBackup, jsonStr, 'utf8');
+                fs.renameSync(tmpBackup, backupPath);
+            } catch (e) {
+                try {
+                    fs.writeFileSync(backupPath, jsonStr, 'utf8');
+                } catch (writeErr) {
+                    console.warn('[SEED] Redundant backup write warning:', writeErr.message);
+                }
             }
         }
+        checkpointSqlite('PASSIVE');
         return finalOutput;
     } catch (err) {
         console.error('[SEED] Failed to export seed-keys.json:', err.message);
@@ -645,10 +692,40 @@ async function importSeedKeys(customList = null) {
         let seedList = customList;
         if (!seedList) {
             const seedPath = getSeedFilePath();
-            if (!fs.existsSync(seedPath)) return 0;
-            const raw = fs.readFileSync(seedPath, 'utf8').trim();
-            if (!raw) return 0;
-            seedList = JSON.parse(raw);
+            const backupPath = `${seedPath}.backup`;
+            let loaded = false;
+
+            if (fs.existsSync(seedPath)) {
+                try {
+                    const raw = fs.readFileSync(seedPath, 'utf8').trim();
+                    if (raw) {
+                        seedList = JSON.parse(raw);
+                        loaded = Array.isArray(seedList) && seedList.length > 0;
+                    }
+                } catch (e) {
+                    console.warn('[SEED] Primary seed file invalid or unreadable:', e.message);
+                }
+            }
+
+            // Disaster Self-Healing: recover baseline keys from backup file if primary missing or damaged
+            if (!loaded) {
+                if (fs.existsSync(backupPath)) {
+                    try {
+                        const rawBackup = fs.readFileSync(backupPath, 'utf8').trim();
+                        if (rawBackup) {
+                            seedList = JSON.parse(rawBackup);
+                            if (Array.isArray(seedList) && seedList.length > 0) {
+                                console.log(`[SEED DISASTER RECOVERY] Successfully recovered ${seedList.length} baseline keys from ${backupPath}`);
+                                try {
+                                    fs.writeFileSync(seedPath, rawBackup, 'utf8');
+                                } catch (healErr) {}
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('[SEED] Backup seed file also unreadable:', e.message);
+                    }
+                }
+            }
         }
         if (!Array.isArray(seedList) || seedList.length === 0) return 0;
 
@@ -921,12 +998,13 @@ async function createActivationKey(params = {}) {
 
     const created = await getKeyByHash(keyHash);
     await exportSeedKeys();
+    checkpointSqlite('PASSIVE');
     return created;
 }
 
 async function getKeyByHash(keyHash) {
     return await queryOne(`
-        SELECT k.*, p.name as product_name
+        SELECT k.*, COALESCE(p.name, 'AZEROX VIP') as product_name
         FROM activation_keys k
         LEFT JOIN products p ON k.product_id = p.id
         WHERE k.key_hash = ?
@@ -935,7 +1013,7 @@ async function getKeyByHash(keyHash) {
 
 async function getKeyById(id) {
     return await queryOne(`
-        SELECT k.*, p.name as product_name
+        SELECT k.*, COALESCE(p.name, 'AZEROX VIP') as product_name
         FROM activation_keys k
         LEFT JOIN products p ON k.product_id = p.id
         WHERE k.id = ?
@@ -958,7 +1036,7 @@ async function getAllKeys({ search = '', status = '', limit = 100 } = {}) {
     }
 
     let sql = `
-        SELECT k.*, p.name as product_name,
+        SELECT k.*, COALESCE(p.name, 'AZEROX VIP') as product_name,
                (SELECT COUNT(*) FROM activations a WHERE a.key_id = k.id AND (a.status = 'ACTIVE' OR a.is_active = 1)) as active_devices_count,
                (SELECT d.device_model FROM activations a JOIN devices d ON a.device_id = d.id WHERE a.key_id = k.id ORDER BY a.activated_at DESC LIMIT 1) as last_device_model
         FROM activation_keys k
@@ -983,7 +1061,7 @@ async function getAllKeys({ search = '', status = '', limit = 100 } = {}) {
 
     if (search && search.trim()) {
         const s = `%${search.trim()}%`;
-        sql += ` AND (k.key_display LIKE ? OR k.customer_name LIKE ? OR k.notes LIKE ? OR p.name LIKE ?)`;
+        sql += ` AND (k.key_display LIKE ? OR k.customer_name LIKE ? OR k.notes LIKE ? OR COALESCE(p.name, 'AZEROX VIP') LIKE ?)`;
         params.push(s, s, s, s);
     }
 
@@ -1027,7 +1105,7 @@ async function getKeyByIdOrString(idOrKey) {
     const byHash = await getKeyByHash(khash);
     if (byHash) return byHash;
     return await queryOne(`
-        SELECT k.*, p.name as product_name
+        SELECT k.*, COALESCE(p.name, 'AZEROX VIP') as product_name
         FROM activation_keys k
         LEFT JOIN products p ON k.product_id = p.id
         WHERE UPPER(k.key_display) = ?
@@ -1037,7 +1115,7 @@ async function getKeyByIdOrString(idOrKey) {
 async function getKeyByDeviceOrSession(deviceId, sessionToken = null) {
     if (!deviceId && !sessionToken) return null;
     let sql = `
-        SELECT k.*, p.name as product_name
+        SELECT k.*, COALESCE(p.name, 'AZEROX VIP') as product_name
         FROM activations a
         JOIN activation_keys k ON (a.key_id = k.id OR a.license_id = k.id)
         LEFT JOIN products p ON k.product_id = p.id
@@ -1434,6 +1512,7 @@ async function deleteKey(idOrKey, deletedBy = 'admin', reason = 'Deleted by Admi
 
     // 5. Update and persist seed-keys.json to guarantee permanence across restarts
     await exportSeedKeys();
+    checkpointSqlite('PASSIVE');
 
     return {
         success: true,
@@ -1443,7 +1522,7 @@ async function deleteKey(idOrKey, deletedBy = 'admin', reason = 'Deleted by Admi
 }
 
 async function clearExpiredKeys() {
-    const allKeysRes = await query("SELECT id, status, expires_at, duration_hours FROM activation_keys");
+    const allKeysRes = await query("SELECT id, status, expires_at, duration_hours, key_hash, key_display FROM activation_keys");
     const now = Date.now();
     let count = 0;
     if (allKeysRes.rows && allKeysRes.rows.length > 0) {
@@ -1451,12 +1530,26 @@ async function clearExpiredKeys() {
             const isPerm = k.duration_hours === -1;
             const isExp = !isPerm && k.expires_at && (new Date(k.expires_at).getTime() <= now);
             if (k.status === 'EXPIRED' || isExp) {
+                try {
+                    if (isPostgres) {
+                        await query(
+                            'INSERT INTO deleted_keys (key_hash, key_display, deleted_by, reason) VALUES (?, ?, ?, ?) ON CONFLICT (key_hash) DO NOTHING',
+                            [k.key_hash, k.key_display, 'system', 'Purged expired key']
+                        );
+                    } else {
+                        await query(
+                            'INSERT OR IGNORE INTO deleted_keys (key_hash, key_display, deleted_by, reason) VALUES (?, ?, ?, ?)',
+                            [k.key_hash, k.key_display, 'system', 'Purged expired key']
+                        );
+                    }
+                } catch (e) {}
                 await query('DELETE FROM activations WHERE key_id = ?', [k.id]);
                 await query('DELETE FROM activation_keys WHERE id = ?', [k.id]);
                 count++;
             }
         }
         await exportSeedKeys();
+        checkpointSqlite('PASSIVE');
     }
     return count;
 }
@@ -1856,9 +1949,11 @@ module.exports = {
     getRecentLogs,
     getAuditLogs: getRecentLogs,
     // Persistence & Testing
+    hashKey,
     exportSeedKeys,
     importSeedKeys,
     getSeedFilePath,
+    checkpointSqlite,
     closeDatabase,
     setSqliteDb
 };

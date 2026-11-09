@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OPTIMIZER</title>
+    <title>AZEROX VIP License Authority</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
@@ -948,8 +948,8 @@
                 <div class="card">
                     <!-- Product Header Row -->
                     <div class="section-header-row" style="margin-bottom: 14px;">
-                        <h2 class="section-title" id="generatorCardTitle">⚡ OPTIMIZER Key Generator</h2>
-                        <span class="section-subtitle-value" id="selectedProductLabel" style="background: rgba(59, 130, 246, 0.15); color: #93c5fd; padding: 4px 10px; border-radius: 6px; font-weight: 700;">OPTIMIZER</span>
+                        <h2 class="section-title" id="generatorCardTitle">👑 AZEROX VIP Key Generator</h2>
+                        <span class="section-subtitle-value" id="selectedProductLabel" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 4px 10px; border-radius: 6px; font-weight: 700;">AZEROX VIP</span>
                     </div>
 
                     <div class="section-header-row">
@@ -969,7 +969,7 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 10px;">
                         <div>
                             <label class="form-label" style="font-size: 11px;">Key Prefix</label>
-                            <input type="text" id="inputKeyPrefix" class="form-input" value="OPTIMIZER" style="padding: 8px 12px; font-size: 13px; font-family: 'JetBrains Mono', monospace; font-weight: 700;">
+                            <input type="text" id="inputKeyPrefix" class="form-input" value="AZEROX-VIP" style="padding: 8px 12px; font-size: 13px; font-family: 'JetBrains Mono', monospace; font-weight: 700;">
                         </div>
                         <div>
                             <label class="form-label" style="font-size: 11px;">Max Devices</label>
@@ -986,7 +986,7 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <circle cx="7.5" cy="15.5" r="5.5"></circle><path d="m21 2-9.6 9.6"></path><path d="m15.5 7.5 3 3"></path>
                         </svg>
-                        <span id="btnGenerateKeyText">Generate Key • OPTIMIZER • 30 Days</span>
+                        <span id="btnGenerateKeyText">Generate Key • AZEROX VIP • 30 Days</span>
                     </button>
                 </div>
 
@@ -1010,7 +1010,7 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; font-size: 12px;">
                             <div>
                                 <span style="color: var(--text-muted);">Product:</span><br>
-                                <b id="latestProductVal" style="color: #93c5fd;">OPTIMIZE</b>
+                                <b id="latestProductVal" style="color: #fbbf24;">AZEROX VIP</b>
                             </div>
                             <div>
                                 <span style="color: var(--text-muted);">Created:</span><br>
@@ -1073,6 +1073,15 @@
                             Refresh
                         </button>
 
+                        <button class="btn btn-outline btn-sm" onclick="downloadKeysBackup()" title="Backup All Keys to JSON">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Backup Keys
+                        </button>
+
                         <button class="btn btn-danger btn-sm" onclick="purgeAllKeys()" title="Remove All Keys From Server">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -1084,8 +1093,8 @@
 
                 <!-- Current Dashboard Notice in Keys List -->
                 <div style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-secondary); background: var(--bg-surface-variant); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                    <span>Active Dashboard: <b id="totalKeysCurrentProductLabel" style="color: #93c5fd;">OPTIMIZER Keys</b></span>
-                    <span style="font-size: 11px; opacity: 0.7;">Switch tabs at top to toggle dashboard</span>
+                    <span>Active Dashboard: <b id="totalKeysCurrentProductLabel" style="color: #fbbf24;">AZEROX VIP Keys</b></span>
+                    <span style="font-size: 11px; opacity: 0.7;">AZEROX VIP License Authority</span>
                 </div>
 
                 <!-- Filter Chips Row -->
@@ -1450,9 +1459,9 @@
     <!-- ========================================== -->
     <script>
         // State variables
-        let currentDashboard = 'OPTIMIZER'; // 'OPTIMIZER' or 'AZEROX VIP'
+        let currentDashboard = 'AZEROX VIP'; // 'AZEROX VIP' or 'OPTIMIZER'
         let selectedHours = 720; // Default to 30 Days (720h)
-        let selectedProduct = 'OPTIMIZER';
+        let selectedProduct = 'AZEROX VIP';
         let latestKeyData = null;
         let allKeys = [];
         let currentStatusFilter = 'ALL';
@@ -1465,21 +1474,39 @@
 
         const TOKEN_STORAGE_KEY = 'azerox_admin_token';
         const USERNAME_STORAGE_KEY = 'azerox_admin_username';
+        const LATEST_KEY_STORAGE = 'azerox_optimizer_latest_key_v2';
+        const ALL_KEYS_STORAGE = 'azerox_optimizer_all_keys_v2';
 
-        // Purge any stale client-side key storage so server is the single source of truth
+        // Load persistent key caches immediately to prevent reload disappearance
         try {
-            localStorage.removeItem('optimizer_admin_latest_key_v1');
-            localStorage.removeItem('optimizer_admin_all_keys_v1');
-            sessionStorage.removeItem('optimizer_admin_latest_key_v1');
-            sessionStorage.removeItem('optimizer_admin_all_keys_v1');
+            const rawLatest = localStorage.getItem(LATEST_KEY_STORAGE);
+            if (rawLatest) latestKeyData = JSON.parse(rawLatest);
+        } catch (e) {}
+
+        try {
+            const rawAll = localStorage.getItem(ALL_KEYS_STORAGE);
+            if (rawAll) {
+                const parsed = JSON.parse(rawAll);
+                if (Array.isArray(parsed)) allKeys = parsed;
+            }
         } catch (e) {}
 
         function saveLatestKey(k) {
             latestKeyData = k;
+            try {
+                if (k) {
+                    localStorage.setItem(LATEST_KEY_STORAGE, JSON.stringify(k));
+                } else {
+                    localStorage.removeItem(LATEST_KEY_STORAGE);
+                }
+            } catch (e) {}
         }
 
         function saveAllKeys(keys) {
             allKeys = Array.isArray(keys) ? keys : [];
+            try {
+                localStorage.setItem(ALL_KEYS_STORAGE, JSON.stringify(allKeys));
+            } catch (e) {}
         }
 
         // --- REAL-TIME SERVER-SENT EVENTS (SSE) & POLLING FALLBACK ---
@@ -1823,8 +1850,8 @@
         }
 
         // --- SEPARATE DASHBOARDS LOGIC (OPTIMIZER vs AZEROX VIP) ---
-        function switchProductDashboard(prod) {
-            currentDashboard = (prod === 'AZEROX VIP') ? 'AZEROX VIP' : 'OPTIMIZER';
+        function switchProductDashboard(prod = 'AZEROX VIP') {
+            currentDashboard = (prod === 'OPTIMIZER') ? 'OPTIMIZER' : 'AZEROX VIP';
             selectedProduct = currentDashboard;
 
             const isVip = (currentDashboard === 'AZEROX VIP');
@@ -1887,8 +1914,8 @@
 
         function updateStatsForCurrentDashboard() {
             const isVip = (currentDashboard === 'AZEROX VIP');
-            const optKeys = allKeys.filter(k => !((k.product_name || '').toUpperCase().includes('VIP')));
-            const vipKeys = allKeys.filter(k => (k.product_name || '').toUpperCase().includes('VIP'));
+            const optKeys = allKeys.filter(k => !((k.product_name || '').toUpperCase().includes('VIP') || (k.product_name || '').toUpperCase().includes('AZEROX')));
+            const vipKeys = allKeys.filter(k => (k.product_name || '').toUpperCase().includes('VIP') || (k.product_name || '').toUpperCase().includes('AZEROX') || !k.product_name);
 
             const badgeOpt = document.getElementById('badgeOptimizerCount');
             if (badgeOpt) badgeOpt.innerText = `${optKeys.length} Keys`;
@@ -1934,12 +1961,26 @@
 
         function syncLatestKeyForCurrentDashboard() {
             const isVip = (currentDashboard === 'AZEROX VIP');
-            const prodKeys = allKeys.filter(k => isVip ? (k.product_name || '').toUpperCase().includes('VIP') : !(k.product_name || '').toUpperCase().includes('VIP'));
+            const matchesCurrent = (k) => {
+                if (!k) return false;
+                const p = (k.product_name || '').toUpperCase();
+                return isVip ? (p.includes('VIP') || p.includes('AZEROX') || !p) : !p.includes('VIP');
+            };
+
+            // If latestKeyData already exists for this dashboard, keep it prioritized
+            if (latestKeyData && matchesCurrent(latestKeyData)) {
+                renderLatestKey(latestKeyData);
+                return;
+            }
+
+            const prodKeys = allKeys.filter(matchesCurrent);
             if (prodKeys.length > 0) {
                 latestKeyData = prodKeys[0];
+                saveLatestKey(latestKeyData);
                 renderLatestKey(latestKeyData);
             } else {
                 latestKeyData = null;
+                saveLatestKey(null);
                 renderLatestKey(null);
             }
         }
@@ -2042,6 +2083,13 @@
 
                     saveLatestKey(latestKeyData);
                     renderLatestKey(latestKeyData);
+
+                    // Race condition prevention: Prepend to allKeys and persist immediately
+                    allKeys = [latestKeyData, ...allKeys.filter(k => k.id !== latestKeyData.id && k.key_display !== latestKeyData.key_display)];
+                    saveAllKeys(allKeys);
+                    renderKeysList();
+                    updateStatsForCurrentDashboard();
+
                     showToast('Key generated successfully!');
                     loadStatsData();
                     loadKeysData();
@@ -2076,7 +2124,7 @@
             if (keyText) keyText.innerText = k.key_display;
 
             const prodVal = document.getElementById('latestProductVal');
-            if (prodVal) prodVal.innerText = k.product_name || selectedProduct || 'OPTIMIZE';
+            if (prodVal) prodVal.innerText = k.product_name || selectedProduct || 'AZEROX VIP';
 
             // Status badge
             const statusBadge = document.getElementById('latestKeyStatusBadge');
@@ -2117,9 +2165,9 @@
 
         function shareLatestKey() {
             if (!latestKeyData) return;
-            const text = `OPTIMIZER Authorization Key:\n${latestKeyData.key_display}\n\nValidity: ${formatDurationLabel(latestKeyData.duration_hours)}\nCreated: ${formatDateTime(latestKeyData.created_at)}`;
+            const text = `AZEROX VIP Authorization Key:\n${latestKeyData.key_display}\n\nValidity: ${formatDurationLabel(latestKeyData.duration_hours)}\nCreated: ${formatDateTime(latestKeyData.created_at)}`;
             if (navigator.share) {
-                navigator.share({ title: 'OPTIMIZER Key', text }).catch(() => copyLatestKey());
+                navigator.share({ title: 'AZEROX VIP Key', text }).catch(() => copyLatestKey());
             } else {
                 copyText(text, 'Key Details');
             }
@@ -2254,7 +2302,15 @@
             try {
                 const res = await api('/api/keys?limit=250');
                 if (res.success && Array.isArray(res.keys)) {
-                    allKeys = res.keys;
+                    // Resilient Server Merging: merge server keys and local keys without wiping newly generated keys
+                    const serverKeys = res.keys;
+                    const serverKeyMap = new Map();
+                    for (const sk of serverKeys) {
+                        if (sk.id) serverKeyMap.set(String(sk.id), sk);
+                        if (sk.key_display) serverKeyMap.set(String(sk.key_display), sk);
+                    }
+                    const localOnly = allKeys.filter(k => !serverKeyMap.has(String(k.id)) && !serverKeyMap.has(String(k.key_display)));
+                    allKeys = [...localOnly, ...serverKeys];
                     saveAllKeys(allKeys);
 
                     updateStatsForCurrentDashboard();
@@ -2285,8 +2341,11 @@
             const isVip = (currentDashboard === 'AZEROX VIP');
             const normFilter = (currentStatusFilter === 'INACTIVE') ? 'NON-ACTIVE' : currentStatusFilter;
             return list.filter(k => {
-                const keyIsVip = (k.product_name || '').toUpperCase().includes('VIP');
-                if (isVip !== keyIsVip) {
+                const keyIsVip = (k.product_name || '').toUpperCase().includes('VIP') || (k.product_name || '').toUpperCase().includes('AZEROX') || !k.product_name;
+                if (isVip && !keyIsVip) {
+                    return false;
+                }
+                if (!isVip && (k.product_name || '').toUpperCase().includes('VIP')) {
                     return false;
                 }
                 const status = computeKeyStatus(k);
@@ -2323,6 +2382,7 @@
 
             container.innerHTML = filtered.map(k => {
                 const status = computeKeyStatus(k);
+                const isPerm = (k.duration_hours === -1 || k.is_permanent);
                 let validityText = '';
                 let dataAttr = '';
 
@@ -2354,7 +2414,7 @@
                         <div class="key-item-header">
                             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                 <span class="key-text-mono" style="font-size: 16px;">${k.key_display}</span>
-                                <span class="status-badge" style="background: ${prodBadgeBg}; color: ${prodBadgeColor}; border: 1px solid ${prodBadgeBorder}; font-size: 10px; padding: 2px 7px; font-weight: 700;">${k.product_name || 'OPTIMIZE'}</span>
+                                <span class="status-badge" style="background: ${prodBadgeBg}; color: ${prodBadgeColor}; border: 1px solid ${prodBadgeBorder}; font-size: 10px; padding: 2px 7px; font-weight: 700;">${k.product_name || 'AZEROX VIP'}</span>
                             </div>
                             ${formatStatusBadge(status)}
                         </div>
@@ -2391,7 +2451,7 @@
                                 `<button class="btn btn-danger btn-sm" onclick="revokeKey(${k.id})">Revoke</button>`
                             }
                             ${status !== 'REVOKED' ? `<button class="btn btn-tonal btn-sm" onclick="openExtendModal(${k.id})">Extend</button>` : ''}
-                            ${status !== 'REVOKED' && !isPerm ? `<button class="btn btn-tonal btn-sm" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);" onclick="openReduceModal(${k.id})">Reduce</button>` : ''}
+                            ${status !== 'REVOKED' && k.duration_hours !== -1 ? `<button class="btn btn-tonal btn-sm" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);" onclick="openReduceModal(${k.id})">Reduce</button>` : ''}
                             <button class="btn btn-outline btn-sm" onclick="openEditModal(${k.id})">Edit</button>
                             <button class="btn btn-outline btn-sm" onclick="openKeyDetailsById(${k.id})">Details</button>
                             <button class="btn btn-outline btn-sm" style="color: var(--status-expired); border-color: rgba(239, 68, 68, 0.4);" onclick="deleteKeyItem(${k.id})">Delete</button>
@@ -2835,6 +2895,44 @@
             }
         }
 
+        async function downloadKeysBackup() {
+            try {
+                let backupData = null;
+                const token = getToken();
+                try {
+                    const res = await fetch('/api/keys/export', {
+                        headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+                    });
+                    if (res.ok) {
+                        backupData = await res.json();
+                    }
+                } catch (e) {}
+
+                if (!backupData || !backupData.keys) {
+                    backupData = {
+                        success: true,
+                        runtime: '24/7 Persistent',
+                        count: allKeys.length,
+                        exported_at: new Date().toISOString(),
+                        keys: allKeys
+                    };
+                }
+
+                const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `azerox-keys-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Key backup downloaded successfully!');
+            } catch (err) {
+                alert('Failed to download key backup: ' + err.message);
+            }
+        }
+
         // --- EDIT KEY MODAL ---
         function openEditModal(id) {
             if (!id) return;
@@ -2940,6 +3038,7 @@
         function openKeyDetailsById(id) {
             const keyItem = allKeys.find(k => k.id === id);
             if (keyItem) openKeyDetails(keyItem);
+            else openKeyDetails({ id });
         }
 
         async function openKeyDetails(k) {
@@ -2966,7 +3065,7 @@
 
                         <div class="info-meta-row">
                             <span class="info-meta-label">Product</span>
-                            <span class="info-meta-val">${keyData.product_name || 'OPTIMIZE'}</span>
+                            <span class="info-meta-val">${keyData.product_name || 'AZEROX VIP'}</span>
                         </div>
                         <div class="info-meta-row">
                             <span class="info-meta-label">Validity Duration</span>

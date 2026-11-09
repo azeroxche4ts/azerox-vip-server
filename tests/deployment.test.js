@@ -63,10 +63,35 @@ test('Deployment Test Suite (Scenarios A through G)', async (t) => {
         server = app.listen(testPort, '127.0.0.1', () => resolve());
     });
 
-    try {
-        // -------------------------------------------------------------
-        // TEST A: Publish a normal application update
-        // -------------------------------------------------------------
+    t.after(async () => {
+        if (server) {
+            await new Promise((resolve) => server.close(resolve));
+        }
+        // Restore original version.json backup
+        if (originalVersionBackup && fs.existsSync(originalVersionFile)) {
+            fs.writeFileSync(originalVersionFile, originalVersionBackup, 'utf8');
+        }
+        // Close test DB and clean up isolated test artifacts
+        if (typeof db.closeDatabase === 'function') {
+            db.closeDatabase();
+        }
+        const cleanupFiles = [
+            testDbPath,
+            `${testDbPath}-wal`,
+            `${testDbPath}-shm`,
+            testSeedPath,
+            `${testSeedPath}.backup`
+        ];
+        for (const f of cleanupFiles) {
+            try {
+                if (fs.existsSync(f)) fs.unlinkSync(f);
+            } catch {}
+        }
+    });
+
+    // -------------------------------------------------------------
+    // TEST A: Publish a normal application update
+    // -------------------------------------------------------------
         await t.test('Test A: Normal update publishing preserves server configuration & database', async () => {
             const adminSecret = config.adminSecret;
             const updatePayload = {
@@ -387,29 +412,4 @@ test('Deployment Test Suite (Scenarios A through G)', async (t) => {
             assert.strictEqual(adminAfter.salt, saltBefore, 'Salt must not change across restart');
             assert.strictEqual(adminAfter.password_hash, hashBefore, 'Password hash must not change across restart');
         });
-
-    } finally {
-        if (server) {
-            await new Promise((resolve) => server.close(resolve));
-        }
-        // Restore original version.json backup
-        if (originalVersionBackup && fs.existsSync(originalVersionFile)) {
-            fs.writeFileSync(originalVersionFile, originalVersionBackup, 'utf8');
-        }
-        // Close test DB and clean up isolated test artifacts
-        if (typeof db.closeDatabase === 'function') {
-            db.closeDatabase();
-        }
-        const cleanupFiles = [
-            testDbPath,
-            `${testDbPath}-wal`,
-            `${testDbPath}-shm`,
-            testSeedPath
-        ];
-        for (const f of cleanupFiles) {
-            try {
-                if (fs.existsSync(f)) fs.unlinkSync(f);
-            } catch {}
-        }
-    }
 });
